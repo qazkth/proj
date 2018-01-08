@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>Temperature Statistics</title>
+    </h:head>
+    <h:body>
+        <div id="tabs" style="width: 100%; display: inline-block; font-size: 25pt">
+            <h:button value="HOME" outcome="index"  style="float: left; font-size: inherit; background-color: lightseagreen"/>
+            <h:button value="STATS" outcome="temperatures" style="float: left; font-size: inherit; background-color: burlywood"/>
+            <h:button value="DOWNLOAD" onmouseover="" outcome="download" style="float: left; font-size: inherit; background-color: darkorange"/>
+            <h:button value="-- LOGO --" style="float: right; font-size: inherit;background-color: darkslateblue" />
+        </div>
+
+        <div align="center" style="width: 95%; margin: 0 auto">
+            <h1>
+                Here you can view statistics for the different thermometers
+            </h1>
+
+            <p>
+                You have the option to view statistics for a specific thermometer, all land/ocean thermometers or 
+                all thermometers registered.
+
+                You can choose to view stats for the past 1, 7, 30, 90 or 365 days for any option or
+                you can choose your own value for the past [1, 365] days.
+            </p>
+            <p>
+                If you want more specific statistics you can choose an option (thermometer/s) and the specified 
+                period of time the statistics should be computed for. 
+
+                The final thing you can choose to do is to <h:link value="download" outcome="download"/> some specified data from our database
+                for you to use in your own way (at a fee, of course, at 1000 EUR/temperature).
+            </p>
+        </div>
+
+        <div style="width: 95%; margin: 3% auto; font-size: 13pt">
+            <h:outputText value=" - Select data from - " style="font-weight: bold" />
+            <h:form id="predefDays">
+                <h:outputText value="Predefined past days: " /> 
+
+                <h:selectOneMenu value="#{statsManager.selectedThermometer}" required="true" 
+                                 style="font-size: inherit; margin-left: 1%">
+
+                    <f:selectItem itemLabel="SELECT A THERMOMETER" />
+                    <f:selectItems value="#{statsManager.selectableThermometerIds}"/>
+                </h:selectOneMenu>
+
+                <h:selectOneMenu value="#{statsManager.selectedDays}" required="true" style="font-size: inherit; margin-left: 1.5%">
+                    <f:selectItem itemLabel="SELECT A PERIOD" />
+                    <f:selectItems value="#{statsManager.predefinedStringPeriods}" var="period" 
+                                   itemLabel="past #{period} days" itemValue="#{period}"/>
+                </h:selectOneMenu>
+
+                <h:commandButton value="GET DATA" action="#{statsManager.dataFromPredefinedDays()}"
+                                 style="font-size: inherit; margin-left: 1%; background-color: darkseagreen" />
+                
+                <h:dataTable value="#{statsManager.predefinedDaysData}" var="data" rendered="#{not empty statsManager.predefinedDaysData}"
+                             style="text-align: left; border-collapse: collapse; border: 1px solid black; margin: 2% auto"
+                             border="1" cellpadding="4">
+
+                    <h:column>
+                        <f:facet name="header"># Reads</f:facet> #{data.count}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Current temp</f:facet> #{data.currentTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Mean</f:facet> 
+                        <h:outputText value="#{data.mean}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Variance</f:facet>
+                        <h:outputText value="#{data.variance}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Standard Deviation</f:facet>
+                        <h:outputText value="#{data.standardDeviation}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">First read time</f:facet> #{statsManager.longToDate(data.firstReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Last read time</f:facet> #{statsManager.longToDate(data.lastReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp</f:facet> #{data.minTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp thermometer id</f:facet> #{data.minTempThermometerId}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp read time</f:facet> #{statsManager.longToDate(data.minTempReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp</f:facet> #{data.maxTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp thermometer id</f:facet> #{data.maxTempThermometerId}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp read time</f:facet> #{statsManager.longToDate(data.maxTempReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Soucre</f:facet> #{data.source}
+                    </h:column>
+                    
+                </h:dataTable>
+                
+            </h:form>
+
+            <h:form id="customDays" style="margin-top: 2%">
+                <h:outputText value="Custom past days: " /> 
+
+                <h:selectOneMenu value="#{statsManager.customDayThermometer}" required="true"
+                                 style="font-size: inherit; margin-left: 1%">
+
+                    <f:selectItem itemLabel="SELECT A THERMOMETER" />
+                    <f:selectItems value="#{statsManager.selectableThermometerIds}"/>
+                </h:selectOneMenu>
+
+                Past X days: 
+                <h:inputText value="#{statsManager.customSelectedDays}" required="true">
+                    <f:validateLongRange minimum="0" maximum="999999" />
+                </h:inputText>
+
+                <h:commandButton value="GET DATA" action="#{statsManager.dataFromCustomDays()}"
+                                 style="font-size: inherit; margin-left: 1%; background-color: darkseagreen" />
+                
+                <h:dataTable value="#{statsManager.customDaysData}" var="data" rendered="#{not empty statsManager.customDaysData}"
+                             style="text-align: left; border-collapse: collapse; border: 1px solid black; margin: 2% auto"
+                             border="1" cellpadding="4">
+
+                    <h:column>
+                        <f:facet name="header"># Reads</f:facet> #{data.count}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Current temp</f:facet> #{data.currentTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Mean</f:facet> 
+                        <h:outputText value="#{data.mean}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Variance</f:facet>
+                        <h:outputText value="#{data.variance}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Standard Deviation</f:facet>
+                        <h:outputText value="#{data.standardDeviation}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">First read time</f:facet> #{statsManager.longToDate(data.firstReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Last read time</f:facet> #{statsManager.longToDate(data.lastReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp</f:facet> #{data.minTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp thermometer id</f:facet> #{data.minTempThermometerId}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp read time</f:facet> #{statsManager.longToDate(data.minTempReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp</f:facet> #{data.maxTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp thermometer id</f:facet> #{data.maxTempThermometerId}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp read time</f:facet> #{statsManager.longToDate(data.maxTempReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Soucre</f:facet> #{data.source}
+                    </h:column>
+                    
+                </h:dataTable>
+                
+            </h:form>
+
+            <h:form id="customPeriod" style="margin-top: 2%">
+                <h:outputText value="Custom period: " /> 
+                <h:selectOneMenu value="#{statsManager.customPeriodThermometer}" required="true" 
+                                 style="font-size: inherit; margin-left: 1%">
+
+                    <f:selectItem itemLabel="SELECT A THERMOMETER" />
+                    <f:selectItems value="#{statsManager.selectableThermometerIds}"/>
+                </h:selectOneMenu>
+
+                Start date (yyyy-mm-dd): 
+                <h:inputText value="#{statsManager.customDateFrom}" required="true" >
+                    <f:convertDateTime pattern="yyyy-MM-dd"/>  
+                </h:inputText>
+
+                End date (yyyy-mm-dd): 
+                <h:inputText value="#{statsManager.customDateTo}" required="true" >
+                    <f:convertDateTime pattern="yyyy-MM-dd"/>  
+                </h:inputText>
+
+                <h:commandButton value="GET DATA" action="#{statsManager.dataFromCustomPeriod()}"
+                                 style="font-size: inherit; margin-left: 1%; background-color: darkseagreen" />
+
+                <h:dataTable value="#{statsManager.customPeriodData}" var="data" rendered="#{not empty statsManager.customPeriodData}"
+                             style="text-align: left; border-collapse: collapse; border: 1px solid black; margin: 2% auto"
+                             border="1" cellpadding="4">
+
+                    <h:column>
+                        <f:facet name="header"># Reads</f:facet> #{data.count}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Current temp</f:facet> #{data.currentTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Mean</f:facet> 
+                        <h:outputText value="#{data.mean}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Variance</f:facet>
+                        <h:outputText value="#{data.variance}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Standard Deviation</f:facet>
+                        <h:outputText value="#{data.standardDeviation}">
+                            <f:convertNumber pattern="#0.00" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">First read time</f:facet> #{statsManager.longToDate(data.firstReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Last read time</f:facet> #{statsManager.longToDate(data.lastReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp</f:facet> #{data.minTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp thermometer id</f:facet> #{data.minTempThermometerId}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Min temp read time</f:facet> #{statsManager.longToDate(data.minTempReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp</f:facet> #{data.maxTemp}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp thermometer id</f:facet> #{data.maxTempThermometerId}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Max temp read time</f:facet> #{statsManager.longToDate(data.maxTempReadTime)}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Soucre</f:facet> #{data.source}
+                    </h:column>
+                    
+                </h:dataTable>
+            </h:form>
+        </div>
+
+
+    </h:body>
+</html>
+

@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Temperature Tracker</title>
+    </h:head>
+    <h:body>
+        
+        <div id="tabs" style="width: 100%; display: inline-block; font-size: 25pt">
+            <h:button value="HOME" outcome="index"  style="float: left; font-size: inherit; background-color: lightseagreen"/>
+            <h:button value="STATS" outcome="temperatures" style="float: left; font-size: inherit; background-color: burlywood"/>
+            <h:button value="DOWNLOAD" onmouseover="" outcome="download" style="float: left; font-size: inherit; background-color: darkorange"/>
+            <h:button value="-- LOGO --" style="float: right; font-size: inherit;background-color: darkslateblue" />
+        </div>
+        
+        <div align="center" style="width: 95%; margin: 0 auto">
+            <h1>
+                Hello and welcome to our temperature tracking website. Fake news?
+            </h1>
+            <p>
+                Here you can view different temperatures at different locations, if you, yourself, want to
+                add a thermometer to track temperatures somewhere in the world. Contact us!
+                <br/>
+                To view statistics for the different thermometers, click on the STATS button on the top of the page.
+                You can click on an "Id" in the "OWNERS" table below to read some more about the organization/person and 
+                their reasons for tracking the temperature at a specific location. 
+            </p>
+        </div>
+
+        <div style="width: 95%; margin: 0 auto">
+            <div style="float: left; width: 45%">
+                <h3>People/Companies currently owning at least one thermometer to track temperatures with our sevices</h3>
+                <h4 align="center">OWNERS</h4>
+                <h:dataTable value="#{presentationManager.owners}" var="owner" 
+                             style="text-align: left; border-collapse: collapse; border: 1px solid black"
+                             border="1" cellpadding="4">
+                    
+                    <h:column>
+                        <f:facet name="header">Id</f:facet> 
+                        <h:link value="#{owner.id}" outcome="owner" />
+                        <f:param name="ownerId" value="#{owner.id}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Company</f:facet> #{owner.company}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Contact Person</f:facet> #{owner.contactPerson}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Phone</f:facet> #{owner.phone}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Email</f:facet> #{owner.email}
+                    </h:column>
+                </h:dataTable>
+            </div>
+
+            <div style="float: right; width: 45%">
+                <h3>All thermometers registered to our services</h3>
+                <h4 align="center">THERMOMETERS</h4>
+                <h:dataTable value="#{presentationManager.thermometers}" var="thermometer" 
+                             style="text-align: left; border-collapse: collapse; border: 1px solid black"
+                             border="1" cellpadding="4">
+                    
+                    <h:column>
+                        <f:facet name="header">Id</f:facet> #{thermometer.id}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Owner Id</f:facet> #{thermometer.ownerId.id}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">On/In</f:facet> #{thermometer.location}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Whereabouts</f:facet> #{thermometer.locationName}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Latitude</f:facet> #{thermometer.latitude}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Longitude</f:facet> #{thermometer.longitude}
+                    </h:column>
+                </h:dataTable>
+            </div>
+        </div>
+
+    </h:body>
+</html>
+
